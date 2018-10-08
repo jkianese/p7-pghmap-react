@@ -10,14 +10,14 @@ class MyMap extends Component {
 
   componentDidMount() {
     this.getVenues()
-    // this.loadMap()
+    // window.initMap = this.initMap
   }
-
+  
   loadMap = () => { // script on index.html. Can I ref that?
     loadScript("https://maps.googleapis.com/maps/api/js?key=AIzaSyBj5AzHYC1kUPRnvaT6G6zsAONHSpKmoqQ&callback=initMap")
     window.initMap = this.initMap
   }
-
+  
   getVenues = () => {
     const endPoint = "https://api.foursquare.com/v2/venues/explore?"
     const parameters = {
@@ -41,7 +41,7 @@ class MyMap extends Component {
       })
   }
 
-  initMap = () => {
+ initMap = () => {
 
     // create a map 
     const map = new window.google.maps.Map(document.getElementById('map'), {
@@ -50,7 +50,7 @@ class MyMap extends Component {
     })
     
     // create an infowindow
-    var infowindow = new window.google.maps.InfoWindow()
+    let infowindow = new window.google.maps.InfoWindow()
 
     // display dynamic markers
     this.state.venues.map(myVenue => {
@@ -60,7 +60,8 @@ class MyMap extends Component {
     var marker = new window.google.maps.Marker({
       position: {lat: myVenue.venue.location.lat, lng: myVenue.venue.location.lng},
       map: map,
-      title: myVenue.venue.name
+      title: myVenue.venue.name,
+      animation: window.google.maps.Animation.DROP,
     })
 
     // click on a marker
@@ -87,12 +88,12 @@ class MyMap extends Component {
 }
 
 function loadScript(source) {
-    var index = window.document.getElementsByTagName("script")[0]
-    var script = window.document.createElement("script")
-    script.src = source
-    script.async = true
-    script.defer = true
-    index.parentNode.insertBefore(script, index)
-  }
+  var index = window.document.getElementsByTagName("script")[0]
+  var script = window.document.createElement("script")
+  script.src = source
+  script.async = true
+  script.defer = true
+  index.parentNode.insertBefore(script, index)
+}
 
 export default MyMap
