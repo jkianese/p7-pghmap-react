@@ -3,21 +3,22 @@ import React, { Component } from 'react'
 import axios from 'axios'
 
 class MyMap extends Component {
-
-  state = {
-    venues: []
-  }
+  constructor(props) {
+    super(props);
+      this.state  ={ 
+        venues: []
+      }
+  }     
 
   componentDidMount() {
     this.getVenues()
-    // window.initMap = this.initMap
-  }
-  
-  loadMap = () => { // script on index.html. Can I ref that?
-    loadScript("https://maps.googleapis.com/maps/api/js?key=AIzaSyBj5AzHYC1kUPRnvaT6G6zsAONHSpKmoqQ&callback=initMap")
     window.initMap = this.initMap
   }
-  
+  // Load Google Maps API Key
+  loadScript = () => { 
+   scriptSrc()
+  }
+  // get data from FourSquare with Axios
   getVenues = () => {
     const endPoint = "https://api.foursquare.com/v2/venues/explore?"
     const parameters = {
@@ -34,51 +35,48 @@ class MyMap extends Component {
       .then(response => {
         this.setState({
           venues: response.data.response.groups[0].items
-        }, this.loadMap())
+        }, this.loadScript())
       })
       .catch(error => {
         console.log("Error: " + error)
       })
   }
 
- initMap = () => {
+  initMap = () => {
 
-  const google = window.google
-
+   const google = window.google
+ 
    // create a map 
    const map = new google.maps.Map(document.getElementById('map'), {
      center: {lat: 40.448506, lng: -80.00250},
      zoom: 12
    })
-    
-  // old code
-  // let infowindow = new window.google.maps.InfoWindow()
-  let infowindow = new google.maps.InfoWindow()
-  
-  // display dynamic markers
-  this.state.venues.map(myVenue => {
+     
+   let infowindow = new google.maps.InfoWindow()
+   
+   // display dynamic markers
+   this.state.venues.map(myVenue => {
+ 
+   let contentString = `${myVenue.venue.name}` 
+ 
+   const marker = new google.maps.Marker({
+     position: {lat: myVenue.venue.location.lat, lng: myVenue.venue.location.lng},
+     map: map,
+     title: myVenue.venue.name,
+     animation: google.maps.Animation.DROP,
+   });
 
-  let contentString = `${myVenue.venue.name}` // Removed Place Name in WT 
-
-  const marker = new window.google.maps.Marker({
-    position: {lat: myVenue.venue.location.lat, lng: myVenue.venue.location.lng},
-    map: map,
-    title: myVenue.venue.name,
-    animation: window.google.maps.Animation.DROP,
-  })
-
-
-
-  // click on a marker
-  marker.addListener('click', function() {
-    marker.setAnimation(window.google.maps.Animation.BOUNCE);
-    setTimeout(function(){ marker.setAnimation(null);}, 1000);
-    // Change the Content
-    infowindow.setContent(contentString)
-    
-    // Open an InfoWindow
-    infowindow.open(map, marker)
-  })
+    // click on a marker
+    marker.addListener('click', function() {
+      marker.setAnimation(window.google.maps.Animation.BOUNCE);
+      setTimeout(function(){ marker.setAnimation(null);}, 1000);
+      
+      // Change the Content
+      infowindow.setContent(contentString)
+      
+      // Open an InfoWindow
+      infowindow.open(map, marker)
+    });
     
   });
   
@@ -93,13 +91,16 @@ class MyMap extends Component {
   }
 }
 
-function loadScript(source) {
-  var index = window.document.getElementsByTagName("script")[0]
-  var script = window.document.createElement("script")
-  script.src = source
+function scriptSrc() {
+  let index = window.document.getElementsByTagName("script")[0]
+  let script = window.document.createElement("script")
+  script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBj5AzHYC1kUPRnvaT6G6zsAONHSpKmoqQ&callback=initMap'
   script.async = true
   script.defer = true
+  script.onerror = function() {
+      document.write("Error: Google Maps can't be loaded");
+  }
   index.parentNode.insertBefore(script, index)
-}
+} 
 
 export default MyMap
