@@ -43,36 +43,42 @@ class MyMap extends Component {
 
  initMap = () => {
 
-    // create a map 
-    const map = new window.google.maps.Map(document.getElementById('map'), {
-      center: {lat: 40.448506, lng: -80.00250},
-      zoom: 12
-    })
+  const google = window.google
+
+   // create a map 
+   const map = new google.maps.Map(document.getElementById('map'), {
+     center: {lat: 40.448506, lng: -80.00250},
+     zoom: 12
+   })
     
-    // create an infowindow
-    let infowindow = new window.google.maps.InfoWindow()
+  // old code
+  // let infowindow = new window.google.maps.InfoWindow()
+  let infowindow = new google.maps.InfoWindow()
+  
+  // display dynamic markers
+  this.state.venues.map(myVenue => {
 
-    // display dynamic markers
-    this.state.venues.map(myVenue => {
+  let contentString = `${myVenue.venue.name}` // Removed Place Name in WT 
 
-    var contentString = `${myVenue.venue.name}` // Removed Place Name in WT 
+  const marker = new window.google.maps.Marker({
+    position: {lat: myVenue.venue.location.lat, lng: myVenue.venue.location.lng},
+    map: map,
+    title: myVenue.venue.name,
+    animation: window.google.maps.Animation.DROP,
+  })
 
-    var marker = new window.google.maps.Marker({
-      position: {lat: myVenue.venue.location.lat, lng: myVenue.venue.location.lng},
-      map: map,
-      title: myVenue.venue.name,
-      animation: window.google.maps.Animation.DROP,
-    })
 
-    // click on a marker
-    marker.addListener('click', function() {
-      
-      // Change the Content
-      infowindow.setContent(contentString)
-      
-      // Open an InfoWindow
-      infowindow.open(map, marker)
-    })
+
+  // click on a marker
+  marker.addListener('click', function() {
+    marker.setAnimation(window.google.maps.Animation.BOUNCE);
+    setTimeout(function(){ marker.setAnimation(null);}, 1000);
+    // Change the Content
+    infowindow.setContent(contentString)
+    
+    // Open an InfoWindow
+    infowindow.open(map, marker)
+  })
     
   });
   
